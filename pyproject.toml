@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "AI-ML-AutoGen"
+version = "0.1.0"
+description = ""
+authors = ["Surendra Kumar <surendrapayal@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.13.1"
+pyautogen = "0.7.2"
+python-dotenv = "1.0.1"
+autogen-agentchat = "0.4.4"
+jira = "3.8.0"
+google-auth = "2.38.0"
+google-auth-oauthlib = "1.2.1"
+google-auth-httplib2 = "0.2.0"
+google-api-python-client = "2.160.0"
+google-generativeai = "0.8.4"
+boto3 = "1.36.8"
+chromadb  = "0.6.3"
+streamlit = "1.41.1"
+pypdf = "5.2.0"
+tiktoken = "0.8.0"
+ipython = "8.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

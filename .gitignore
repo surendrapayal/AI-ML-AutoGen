@@ -169,3 +169,11 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+MODEL_CONFIG_LIST
+.env
+service-account-credentials.json
+poetry.lock
+gnoc/db/*
+.idea/
