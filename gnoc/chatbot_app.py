@@ -2,6 +2,7 @@ import json
 import os
 import streamlit as st
 
+from notification_manager_agent import NotificationService
 from incident_manager_agent import IncidentManager
 from priority_identification_agent import PriorityIdentificationAgent
 
@@ -73,6 +74,7 @@ for i, message in enumerate(st.session_state["messages"]):
                             jira_extracted_responses = json.loads(
                             extract_tool_responses(jira_response)[0].get("content"))
                             jira_id = jira_extracted_responses.get("jira_id")
+                            jira_link = f"https://rahuluraneai.atlassian.net/browse/{jira_id}"
 
                             white_board_response = incident_manager.initiate_white_board_creation(jira_id, summary,
                                                                                                   segment, product)
@@ -88,10 +90,35 @@ for i, message in enumerate(st.session_state["messages"]):
 
                             # result = main.kickoff(summary, description, priority, segment, product, impact, urgency)
                             assistant_response = ""
-                            assistant_response = assistant_response + f"<b>Jira Information:</b> <a href='https://rahuluraneai.atlassian.net/browse/{jira_id}'>{jira_id}</a>\n\n"
+                            assistant_response = assistant_response + f"<b>Jira Information:</b> <a href='{jira_link}'>{jira_id}</a>\n\n"
                             assistant_response = assistant_response + f"<b>Status IO Page Information:</b> <a href='{status_io_page_link}'>Status IO Page</a>\n\n"
                             assistant_response = assistant_response + f"<b>White Board Information:</b> <a href='{white_board_link}'>White Board</a>\n\n"
                             st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+
+                            # Notification service
+                            notification_service = NotificationService()
+
+                            # Insensitive email
+                            email_insensitive_content = json.loads(notification_service.generate_insensitive_email(description, segment, product, priority, impact,
+                                                                       jira_id, jira_link, status_io_page_link,
+                                                                       white_board_link))
+                            print(f"email_insensitive_content:- {email_insensitive_content}")
+                            notification_service.insensitive_notification_tool(email_insensitive_content.get("subject"), email_insensitive_content.get("body"))
+
+                            # Sensitive email
+                            email_sensitive_content = json.loads(notification_service.generate_sensitive_email(description,
+                                                                                                        segment,
+                                                                                                        product,
+                                                                                                        priority,
+                                                                                                        impact,
+                                                                                                        jira_id,
+                                                                                                        jira_link,
+                                                                                                        status_io_page_link,
+                                                                                                        white_board_link))
+                            print(f"email_sensitive_content:- {email_sensitive_content}")
+                            notification_service.sensitive_notification_tool(
+                                email_sensitive_content.get("subject"), email_sensitive_content.get("body"))
+
                             continue
                 with col2:
                     if st.button("👎", key=f"thumbs_down_{i}"):
@@ -165,6 +192,7 @@ if user_input := st.chat_input("Please enter your GNOC related query..."):
                         jira_response = incident_manager.initiate_jira_ticket_creation(priority, summary, description)
                         jira_extracted_responses = json.loads(extract_tool_responses(jira_response)[0].get("content"))
                         jira_id = jira_extracted_responses.get("jira_id")
+                        jira_link = f"https://rahuluraneai.atlassian.net/browse/{jira_id}"
 
                         white_board_response = incident_manager.initiate_white_board_creation(jira_id, summary, segment, product)
                         white_board_extracted_responses = json.loads(extract_tool_responses(white_board_response)[0].get("content"))
@@ -176,10 +204,36 @@ if user_input := st.chat_input("Please enter your GNOC related query..."):
                         status_io_page_link = status_page_extracted_responses.get("status_io_page_link")
 
                         assistant_response = ""
-                        assistant_response = assistant_response + f"<b>Jira Information:</b> <a href='https://rahuluraneai.atlassian.net/browse/{jira_id}'>{jira_id}</a>\n\n"
+                        assistant_response = assistant_response + f"<b>Jira Information:</b> <a href='{jira_link}'>{jira_id}</a>\n\n"
                         assistant_response = assistant_response + f"<b>Status IO Page Information:</b> <a href='{status_io_page_link}'>Status IO Page</a>\n\n"
                         assistant_response = assistant_response + f"<b>White Board Information:</b> <a href='{white_board_link}'>White Board</a>\n\n"
                         st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+
+                        # Notification service
+                        notification_service = NotificationService()
+
+                        # Insensitive email
+                        email_insensitive_content = notification_service.generate_insensitive_email(description,
+                                                                                                    segment, product,
+                                                                                                    priority, impact,
+                                                                                                    jira_id, jira_link,
+                                                                                                    status_io_page_link,
+                                                                                                    white_board_link)
+                        notification_service.insensitive_notification_tool(email_insensitive_content.get("subject"),
+                                                                           email_insensitive_content.get("body"))
+
+                        # Sensitive email
+                        email_sensitive_content = notification_service.generate_sensitive_email(description,
+                                                                                                segment,
+                                                                                                product,
+                                                                                                priority,
+                                                                                                impact,
+                                                                                                jira_id,
+                                                                                                jira_link,
+                                                                                                status_io_page_link,
+                                                                                                white_board_link)
+                        notification_service.sensitive_notification_tool(
+                            email_sensitive_content.get("subject"), email_sensitive_content.get("body"))
             with col2:
                 if st.button("👎", key=f"thumbs_down_{i}"):
                     st.session_state.feedback.append({"message_index": i, "feedback": "negative"})

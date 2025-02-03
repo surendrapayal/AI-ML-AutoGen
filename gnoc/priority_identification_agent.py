@@ -4,7 +4,7 @@ import chromadb
 from autogen import AssistantAgent, config_list_from_json
 from autogen.agentchat.contrib.retrieve_user_proxy_agent import RetrieveUserProxyAgent
 from dotenv import load_dotenv
-from autogen.retrieve_utils import TEXT_FORMATS
+# from autogen.retrieve_utils import TEXT_FORMATS
 
 class PriorityIdentificationAgent:
     def __init__(self, pdf_file_path=None, model_config_file=None, chromadb_file_path=None):
@@ -20,12 +20,11 @@ class PriorityIdentificationAgent:
         # chromadb_path = os.getenv("CHROMADB_PATH")
 
         self.pdf_file = pdf_file_path or os.getenv("PRIORITY_FILE")
+        print(f"self.pdf_file:- {self.pdf_file}")
         if model_config_file is None:
             self.config_list = config_list_from_json(env_or_file=os.getenv("MODEL_CONFIG_FILE"))
         else:
             self.config_list = config_list_from_json(env_or_file=model_config_file)
-
-        print(f"self.config_list:- {self.config_list}")
 
         if chromadb_file_path is None:
             # self.chromadb_path = os.path.join(os.getcwd(), os.getenv("CHROMADB_FILE_PATH"))
@@ -108,7 +107,7 @@ class PriorityIdentificationAgent:
 
         try:
             chat_result = self.ragproxyagent.initiate_chat(
-                self.assistant, message=self.ragproxyagent.memessage_generator, problem=initial_task, n_results=30
+                self.assistant, message=self.ragproxyagent.message_generator, problem=initial_task, n_results=30
             )
 
             summary = chat_result.summary.strip("```json\n").strip("\n```")
@@ -131,6 +130,7 @@ class PriorityIdentificationAgent:
 
 # Example usage
 if __name__ == "__main__":
+    # load_dotenv()
     pdf_path = os.getenv("PRIORITY_FILE")
     model_config_path = os.getenv("MODEL_CONFIG_PATH")
     chromadb_path = os.getenv("CHROMADB_FILE_PATH")
