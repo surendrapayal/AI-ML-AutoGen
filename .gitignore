@@ -181,3 +181,4 @@ calendar_token.json
 poetry.lock
 gnoc/db/*
 .idea/
+tmp/

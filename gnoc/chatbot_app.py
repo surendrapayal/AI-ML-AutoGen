@@ -99,14 +99,16 @@ for i, message in enumerate(st.session_state["messages"]):
                             notification_service = NotificationService()
 
                             # Insensitive email
-                            email_insensitive_content = json.loads(notification_service.generate_insensitive_email(description, segment, product, priority, impact,
+                            email_insensitive_content = notification_service.generate_insensitive_email(description, segment, product, priority, impact,
                                                                        jira_id, jira_link, status_io_page_link,
-                                                                       white_board_link))
+                                                                       white_board_link)
                             print(f"email_insensitive_content:- {email_insensitive_content}")
+                            print(f"email_insensitive_content :: subject:- {email_insensitive_content.get("subject")}")
+                            print(f"email_insensitive_content :: body:- {email_insensitive_content.get("body")}")
                             notification_service.insensitive_notification_tool(email_insensitive_content.get("subject"), email_insensitive_content.get("body"))
 
                             # Sensitive email
-                            email_sensitive_content = json.loads(notification_service.generate_sensitive_email(description,
+                            email_sensitive_content = notification_service.generate_sensitive_email(description,
                                                                                                         segment,
                                                                                                         product,
                                                                                                         priority,
@@ -114,8 +116,10 @@ for i, message in enumerate(st.session_state["messages"]):
                                                                                                         jira_id,
                                                                                                         jira_link,
                                                                                                         status_io_page_link,
-                                                                                                        white_board_link))
+                                                                                                        white_board_link)
                             print(f"email_sensitive_content:- {email_sensitive_content}")
+                            print(f"email_sensitive_content :: subject:- {email_sensitive_content.get("subject")}")
+                            print(f"email_sensitive_content :: body:- {email_sensitive_content.get("body")}")
                             notification_service.sensitive_notification_tool(
                                 email_sensitive_content.get("subject"), email_sensitive_content.get("body"))
 
@@ -155,8 +159,9 @@ if user_input := st.chat_input("Please enter your GNOC related query..."):
     result = PriorityIdentificationAgent().prioritize_issue(user_input)
     # Append bot message
     assistant_response = ""
-    if result.get("description").lower() == "This issue does not appear to be related to any GP products, and unfortunately, I am unable to proceed with further action. Thank you for your understanding.".lower():
-        assistant_response = assistant_response + f"<b>Issue Description:</b> <span style='color:red;'>{result.get("description")}</span>"
+    # if result.get("description").lower() == "This issue does not appear to be related to any GP products, and unfortunately, I am unable to proceed with further action. Thank you for your understanding.".lower():
+    if result is None:
+        assistant_response = assistant_response + f"<b>Issue Description:</b> <span style='color:red;'>This issue does not appear to be related to any GP products, and unfortunately, I am unable to proceed with further action. Thank you for your understanding.</span>"
     else:
         assistant_response = assistant_response + f"<b>Issue Summary:</b> {result.get("summary")}\n\n"
         assistant_response = assistant_response + f"<b>Issue Description:</b> {result.get("description")}\n\n"
