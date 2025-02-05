@@ -182,3 +182,4 @@ poetry.lock
 gnoc/db/*
 .idea/
 tmp/
+gnoc/temp.py
