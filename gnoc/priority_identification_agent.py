@@ -1,3 +1,4 @@
+import asyncio
 import os
 import json
 import chromadb
@@ -5,6 +6,34 @@ from autogen import AssistantAgent, config_list_from_json
 from autogen.agentchat.contrib.retrieve_user_proxy_agent import RetrieveUserProxyAgent
 from dotenv import load_dotenv
 # from autogen.retrieve_utils import TEXT_FORMATS
+
+class MyConversableAgent(AssistantAgent):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.input_future = None
+
+    async def a_get_human_input(self, prompt: str) -> str:
+        """
+        Overriding the get_human_input function to capture user input asynchronously
+        and handle the input flow with custom logic.
+        """
+        print(f"Prompt for input: {prompt}")
+        # This is where you would get the user input in your custom way
+        # For instance, in an interactive console, you can use `input(prompt)` to collect user input.
+        user_input = await self.get_input_from_ui(prompt)  # Replace this with your own method to get input
+
+        return user_input
+
+    async def get_input_from_ui(self, prompt: str) -> str:
+        """
+        Custom method to get input from the UI, e.g., Panel, Command-line, etc.
+        You can replace this method with specific UI logic or call a callback from your frontend.
+        """
+        print(f"Getting input for prompt: {prompt}")
+        # Simulate user input for now. This should be replaced with actual UI input collection logic.
+        user_input = "Sample input"  # Replace this with actual input gathering
+        await asyncio.sleep(1)  # Simulate delay for user input
+        return user_input
 
 class PriorityIdentificationAgent:
     def __init__(self, pdf_file_path=None, model_config_file=None, chromadb_file_path=None):
@@ -80,7 +109,7 @@ class PriorityIdentificationAgent:
         # Initialize RetrieveUserProxyAgent
         self.ragproxyagent = RetrieveUserProxyAgent(
             name="ragproxyagent",
-            human_input_mode="NEVER",
+            human_input_mode="ALWAYS",
             retrieve_config={
                 "task": "qa",
                 "docs_path": self.pdf_file,

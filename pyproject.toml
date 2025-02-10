@@ -30,6 +30,7 @@ flaml = {extras = ["automl"], version = "^2.3.3"}
 ag2 = {extras = ["gemini"], version = "^0.7.3"}
 sentence_transformers = "3.4.1"
 json5 = "0.10.0"
+panel = "1.6.0"
 
 [build-system]
 requires = ["poetry-core"]
